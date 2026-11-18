@@ -1,0 +1,92 @@
+CODE::BLOCKS 20.03 (MinGW) + FREEGLUT — BANGLA SETUP
+======================================================
+
+এই guide Code::Blocks 20.03-এর জন্য। 25.03-এর instructions অনুসরণ করার দরকার নেই।
+
+A. আগে compiler architecture check
+----------------------------------
+সাধারণ 20.03 MinGW installer-এ MinGW-w64 GCC 8.1.0 x86_64 toolchain থাকে।
+তবে তোমার installation আলাদা হতে পারে, তাই নিশ্চিত হও:
+
+1. Code::Blocks > Settings > Compiler > Toolchain executables
+2. C compiler-এর path দেখে MinGW folder খুঁজে নাও।
+3. CMD খুলে এই command চালাও (path তোমার installation অনুযায়ী বদলাবে):
+
+"C:\Program Files\CodeBlocks\MinGW\bin\gcc.exe" -dumpmachine
+
+Output:
+- x86_64-w64-mingw32 = 64-bit compiler, 64-bit FreeGLUT package নাও
+- i686-w64-mingw32 = 32-bit compiler, 32-bit FreeGLUT package নাও
+
+B. FreeGLUT download
+--------------------
+https://www.transmissionzero.co.uk/software/freeglut-devel/
+
+অথবা:
+https://www.songho.ca/opengl/gl_freeglut.html
+
+MinGW/GCC binary package নাও। Compiler architecture-এর সঙ্গে মিলিয়ে 32/64-bit package বেছে নাও।
+MSVC/Visual Studio package নিও না।
+
+C. FreeGLUT folder তৈরি
+-----------------------
+ZIP extract করে C:\\freeglut folder-এ রাখো। Final structure:
+
+C:\\freeglut\\include\\GL\\freeglut.h
+C:\\freeglut\\lib\\libfreeglut.dll.a
+C:\\freeglut\\bin\\libfreeglut.dll
+
+কিছু package-এ library file-এর নাম libfreeglut.a হতে পারে; সে ক্ষেত্রে folder-এ কী আছে দেখে নেবে।
+MinGW linking-এর জন্য .a বা .dll.a import/static library দরকার। শুধু .lib থাকলে সেটা MSVC package হতে পারে।
+
+D. Code::Blocks 20.03-এ project configure
+-----------------------------------------
+1. Airport_FreeGLUT_Starter.cbp খুলবে।
+2. Project > Build options...
+3. বাম পাশের project root select করবে।
+4. Search directories > Compiler > Add:
+   C:\\freeglut\\include
+5. Search directories > Linker > Add:
+   C:\\freeglut\\lib
+6. Linker settings > Link libraries-এ add:
+   freeglut
+   glu32
+   opengl32
+7. OK চাপো।
+
+Project root-এ settings দিলে সাধারণত Debug/Release target inherit করে। যদি target-specific override থাকে, Debug এবং Release-এও একই settings দাও।
+
+E. DLL copy
+------------
+C:\\freeglut\\bin\\libfreeglut.dll
+Copy করে project-এর bin\\Debug folder-এ রাখো, EXE-এর পাশে।
+Release build করলে bin\\Release-এও DLL copy করতে হবে।
+
+F. Build and Run
+----------------
+Code::Blocks-এ F9 চাপো।
+Starter test window খুললে setup সফল।
+S = animation pause/start
+A = plane reset/start
+ESC = exit
+
+G. Common errors
+----------------
+cannot find -lfreeglut:
+- Compiler architecture check করো।
+- C:\\freeglut\\lib-এ libfreeglut.dll.a বা libfreeglut.a আছে কি না দেখো।
+- Linker search directory ঠিক আছে কি না দেখো।
+
+GL/freeglut.h: No such file:
+- C:\\freeglut\\include path এবং include\\GL\\freeglut.h পরীক্ষা করো।
+
+freeglut.dll missing:
+- libfreeglut.dll EXE-এর পাশে copy করো।
+
+undefined reference:
+- Linker libraries: freeglut, glu32, opengl32 যোগ করো।
+- Library architecture compiler-এর সঙ্গে মেলে কি না দেখো।
+
+NOTE:
+Windows-এর opengl32 ও glu32 system libraries; এগুলো আলাদা করে download কোরো না।
+এই starter ZIP-এ FreeGLUT-এর third-party binary package নেই; সেটি আলাদা download করতে হবে।
